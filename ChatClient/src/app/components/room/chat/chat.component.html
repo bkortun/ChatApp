@@ -1,0 +1,11 @@
+<div class="w-75 m-2" >
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" [(ngModel)]="message" placeholder="Message" aria-label="Message" aria-describedby="basic-addon1">
+    <button type="button" class="btn btn-secondary" (click)="sendMessage()">Submit</button>
+  </div>
+  <div class="form-floating mb-3">
+    <textarea class="form-control" disabled style="height:500px">{{ receivedMessages.join('\n') }}</textarea>
+    <label for="floatingTextarea2Disabled">Chat</label>
+  </div>
+</div>
+
