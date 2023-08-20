@@ -1,1 +1,11 @@
-<p>users works!</p>
+<div>
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" [(ngModel)]="username" placeholder="Username" aria-label="Message" aria-describedby="basic-addon1">
+    <button type="button" class="btn btn-secondary" (click)="sendUsername()">Submit</button>
+  </div>
+  <ul class="list-group">
+    <li class="list-group-item active" aria-current="true">Users</li>
+    <li class="list-group-item" *ngFor="let client of clients">{{client.username}}</li>
+
+  </ul>
+</div>

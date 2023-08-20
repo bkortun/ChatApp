@@ -1,19 +1,23 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { Observable, Subject } from 'rxjs';
+import { Client } from '../models/client';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService {
 
-  private connection:HubConnection
+  public connection:HubConnection
   private messageSubject: Subject<string> = new Subject<string>();
   private connectionStatus:ConnectionStatus=ConnectionStatus.Connecting
+  private baseUrl:string="https://localhost:7149"
 
-  constructor() {
+  private clients:Client[]
+  constructor(private httpClient: HttpClient) {
     this.connection = new HubConnectionBuilder()
-    .withUrl("https://localhost:7149/messages")
+    .withUrl(`${this.baseUrl}/messages`)
     .withAutomaticReconnect()
     .build()
 
@@ -27,12 +31,10 @@ export class MessageService {
         this.connection.on('ClientLeft',(connectionId)=>{
           console.log(`${connectionId} left`)
         })
+        this.connection.on('ListClients',(clients:Client[])=>{
+          this.clients=clients
+        })
     }).catch(err => console.error('Error while starting SignalR connection:', err));
-
-
-
-
-
 
     this.connection.onreconnecting(()=>this.connectionStatus=ConnectionStatus.Connecting)
     this.connection.onclose(()=>this.connectionStatus=ConnectionStatus.Failed)
@@ -57,6 +59,23 @@ export class MessageService {
 
    getMessageObservable(): Observable<string> {
     return this.messageSubject.asObservable();
+  }
+
+  /*addToGroup(){
+    this.httpClient.post(`${this.baseUrl}/api/messages/addToGroup`)
+  }
+
+  removeToGroup(){
+    this.httpClient.post(`${this.baseUrl}/api/messages/removeToGroup`)
+  }*/
+
+  async setConnectionToUser(username:string){
+    this.connection.invoke("AddClientAsync",username)
+  }
+
+  async getClientsList():Promise<Client[]>{
+    await this.connection.invoke("ListClientsAsync")
+    return this.clients;
   }
 
   getConnectionStatus():ConnectionStatus{

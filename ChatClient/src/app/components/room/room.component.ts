@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConnectionStatus } from 'src/app/services/message.service';
+import { ConnectionStatus, MessageService } from 'src/app/services/message.service';
 
 @Component({
   selector: 'app-room',
@@ -8,7 +8,7 @@ import { ConnectionStatus } from 'src/app/services/message.service';
 })
 export class RoomComponent implements OnInit {
 
-  constructor() { }
+  constructor(private messageService:MessageService) { }
   connectionStatus: string = ""
 
   ngOnInit(): void {
@@ -29,6 +29,10 @@ export class RoomComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  removeToGroup(){
+    //this.messageService.removeToGroup()
   }
 
 }

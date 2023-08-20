@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SignalR.HubContexts;
+using SignalR.HubServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,7 @@ namespace SignalR.Configurations
     {
         public static void AddSignalRServices(this IServiceCollection service)
         {
+            service.AddTransient<IMessageHubService, MessageHubService>();
             service.AddSignalR();
         }
     }

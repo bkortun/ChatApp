@@ -3,7 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { RoomModule } from './components/room/room.module';
+import { ComponentsModule } from './components/components.module';
+import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   declarations: [
@@ -12,7 +15,9 @@ import { RoomModule } from './components/room/room.module';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    RoomModule
+    ComponentsModule,
+    BrowserAnimationsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
