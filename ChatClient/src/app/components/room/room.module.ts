@@ -4,6 +4,7 @@ import { UsersComponent } from './users/users.component';
 import { RoomComponent } from './room.component';
 import { FormsModule } from '@angular/forms';
 import { ChatComponent } from './chat/chat.component';
+import { RouterModule } from '@angular/router';
 
 
 
@@ -15,7 +16,8 @@ import { ChatComponent } from './chat/chat.component';
   ],
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterModule.forChild([{path:":roomName",component:RoomComponent}])
   ]
 })
 export class RoomModule { }

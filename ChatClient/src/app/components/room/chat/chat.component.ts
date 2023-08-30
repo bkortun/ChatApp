@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { ConnectionStatus, MessageService } from 'src/app/services/message.service';
+import { Client } from 'src/app/models/client';
+import { MessageService } from 'src/app/services/message.service';
 
 @Component({
   selector: 'app-chat',
@@ -12,13 +13,13 @@ export class ChatComponent implements OnInit {
 
   message:string=""
   receivedMessages:string[]=[]
-  @Output() dataEmitter:EventEmitter<any>=new EventEmitter()
-  connectionStatus:ConnectionStatus=ConnectionStatus.Connecting
 
   ngOnInit(): void {
-    this.dataEmitter.emit(this.messageService.getConnectionStatus())
     this.messageService.getMessageObservable().subscribe(message => {
-      this.receivedMessages.push(message)
+      if(message.client.connectionId==this.messageService.connection.connectionId)
+        this.receivedMessages.push(`YOU: ${message.message}`)
+      else
+        this.receivedMessages.push(`${message.client.username.toUpperCase()}: ${message.message}`)
     });
   }
 

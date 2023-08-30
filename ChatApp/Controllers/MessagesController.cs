@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SignalR.HubContexts;
+using SignalR.Models;
 
 namespace ChatApp.Controllers
 {
@@ -16,24 +17,12 @@ namespace ChatApp.Controllers
 		}
 
 		[HttpGet("{message}")]
-		public async Task<IActionResult> Get(string message)
+		public async Task<IActionResult> Get([FromRoute]string message)
 		{
 			await _messageHubService.SendAsync(message);
 			return Ok();
 		}
 
-		[HttpPost("[action]")]
-		public async Task<IActionResult> AddToGroup(string connectionId)
-		{
-			await _messageHubService.AddToGroupAsync(connectionId);
-			return Ok();
-		}
-
-		[HttpPost("[action]")]
-		public async Task<IActionResult> RemoveToGroup(string connectionId)
-		{
-			await _messageHubService.RemoveToGroupAsync(connectionId);
-			return Ok();
-		}
+	
 	}
 }

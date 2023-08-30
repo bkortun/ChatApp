@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { Observable, Subject } from 'rxjs';
 import { Client } from '../models/client';
+import { Message } from '../models/message';
+import { Group } from '../models/group';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +12,7 @@ import { Client } from '../models/client';
 export class MessageService {
 
   public connection:HubConnection
-  private messageSubject: Subject<string> = new Subject<string>();
-  private connectionStatus:ConnectionStatus=ConnectionStatus.Connecting
+  private messageSubject: Subject<Message> = new Subject<Message>();
   private baseUrl:string="https://localhost:7149"
 
   private clients:Client[]
@@ -22,8 +23,9 @@ export class MessageService {
     .build()
 
     this.startAsync().then(()=>{
-        this.connection.on('ReceiveMessage', (message: string) => {
-          this.messageSubject.next(message);
+        this.connection.on('ReceiveMessage', (message: string, client:Client) => {
+          let clientsMessage:Message={message:message,client:client}
+          this.messageSubject.next(clientsMessage);
         })
         this.connection.on('ClientJoined',(connectionId)=>{
           console.log(`${connectionId} joined`)
@@ -36,9 +38,9 @@ export class MessageService {
         })
     }).catch(err => console.error('Error while starting SignalR connection:', err));
 
-    this.connection.onreconnecting(()=>this.connectionStatus=ConnectionStatus.Connecting)
-    this.connection.onclose(()=>this.connectionStatus=ConnectionStatus.Failed)
-    this.connection.onreconnected(()=>this.connectionStatus=ConnectionStatus.Connected)
+    // this.connection.onreconnecting(()=>this.connectionStatus=ConnectionStatus.Connecting)
+    // this.connection.onclose(()=>this.connectionStatus=ConnectionStatus.Failed)
+    // this.connection.onreconnected(()=>this.connectionStatus=ConnectionStatus.Connected)
     //TODO bu çıktıları ekrana veremedim
 
    }
@@ -57,17 +59,9 @@ export class MessageService {
     this.connection.invoke("SendAsync",message).catch(error=>console.log(error))
    }
 
-   getMessageObservable(): Observable<string> {
+   getMessageObservable(): Observable<Message> {
     return this.messageSubject.asObservable();
   }
-
-  /*addToGroup(){
-    this.httpClient.post(`${this.baseUrl}/api/messages/addToGroup`)
-  }
-
-  removeToGroup(){
-    this.httpClient.post(`${this.baseUrl}/api/messages/removeToGroup`)
-  }*/
 
   async setConnectionToUser(username:string){
     this.connection.invoke("AddClientAsync",username)
@@ -78,13 +72,6 @@ export class MessageService {
     return this.clients;
   }
 
-  getConnectionStatus():ConnectionStatus{
-    return this.connectionStatus;
-  }
+
 }
 
-export enum ConnectionStatus{
-  Failed,
-  Connecting,
-  Connected
-}

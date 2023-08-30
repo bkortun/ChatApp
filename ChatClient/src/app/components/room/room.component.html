@@ -1,10 +1,10 @@
 <div class="m-3">
   <div class="fs-5 mb-3">
-    <a (click)="removeToGroup()" href="/rooms" class="text-danger text-decoration-none"><p class="p-2"><i class="bi bi-backspace p-2"></i>Back to Rooms</p></a>
+    <a href="/rooms" class="text-danger text-decoration-none"><p class="p-2"><i class="bi bi-backspace p-2"></i>Back to Rooms</p></a>
   </div>
   <div class="row m-2">
     <div class="col-md-9">
-      <app-chat (dataEvent)="getConnectionStatus($event)"></app-chat>
+      <app-chat ></app-chat>
     </div>
     <div class="col-md-3">
       <app-users></app-users>

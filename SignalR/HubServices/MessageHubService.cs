@@ -2,6 +2,7 @@
 using SignalR.Contracts;
 using SignalR.HubContexts;
 using SignalR.Hubs;
+using SignalR.Test;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,19 +20,9 @@ namespace SignalR.HubServices
 			_hubContext = hubContext;
 		}
 
-		public async Task AddToGroupAsync(string connectionId)
-		{
-			await _hubContext.Groups.AddToGroupAsync(connectionId, "room1");
-		}
-
-		public async Task RemoveToGroupAsync(string connectionId)
-		{
-			await _hubContext.Groups.RemoveFromGroupAsync(connectionId, "room1");
-		}
-
 		public async Task SendAsync(string message)
 		{
-			await _hubContext.Clients.All.ReceiveMessage(message);
+			//await _hubContext.Clients.All.ReceiveMessage(message);
 		}
 	}
 }

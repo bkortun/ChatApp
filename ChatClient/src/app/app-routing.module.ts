@@ -5,7 +5,7 @@ import { RoomsComponent } from './components/rooms/rooms.component';
 
 const routes: Routes = [
   {path:"rooms",component:RoomsComponent},
-  {path:"room1",component:RoomComponent}
+  {path:"",loadChildren:()=>import("../app/components/room/room.module").then(module=>module.RoomModule)}
 ];
 
 @NgModule({

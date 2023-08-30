@@ -10,7 +10,7 @@ namespace SignalR.Contracts
 	public interface IMessageClient
 	{
 		Task ListClients(List<Client> clients);
-		Task ReceiveMessage(string message);
+		Task ReceiveMessage(string message,Client client);
 		Task ClientJoined(string connectionId);
 		Task ClientLeft(string connectionId);
 

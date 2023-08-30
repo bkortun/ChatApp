@@ -24,13 +24,24 @@ namespace SignalR.Hubs
 			await Clients.Others.ClientJoined(client.Username);
 		}
 
+		public async Task AddClientToGroupAsync(string groupName)
+		{
+			await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+		}
+
+		public async Task RemoveClientToGroupAsync(string groupName)
+		{
+			await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+		}
+
 		public async Task ListClientsAsync()
 		{
 			await Clients.All.ListClients(ClientTestSource.Clients);
 		}
 		public async Task SendAsync(string message)
 		{
-			await Clients.All.ReceiveMessage(message);
+			var senderClient = ClientTestSource.Clients.FirstOrDefault(a => a.ConnectionId == Context.ConnectionId);
+			await Clients.All.ReceiveMessage(message, senderClient);
 		}
 		public override async Task OnConnectedAsync()
 		{

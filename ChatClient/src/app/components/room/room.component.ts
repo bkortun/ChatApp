@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ConnectionStatus, MessageService } from 'src/app/services/message.service';
+import { ActivatedRoute } from '@angular/router';
+import { NgxSpinnerService } from 'ngx-spinner';
+import { MessageService } from 'src/app/services/message.service';
 
 @Component({
   selector: 'app-room',
@@ -8,31 +10,15 @@ import { ConnectionStatus, MessageService } from 'src/app/services/message.servi
 })
 export class RoomComponent implements OnInit {
 
-  constructor(private messageService:MessageService) { }
-  connectionStatus: string = ""
+  constructor(private messageService:MessageService, private route:ActivatedRoute, private spinner:NgxSpinnerService) { }
+
+
+  roomName:string
 
   ngOnInit(): void {
-  }
-
-  getConnectionStatus(data: any) {
-    console.log(data)
-    switch (data) {
-      case ConnectionStatus.Failed:
-        this.connectionStatus = "Failed"
-        break;
-      case ConnectionStatus.Connected:
-        this.connectionStatus = "Connected"
-        break;
-      case ConnectionStatus.Connecting:
-        this.connectionStatus = "Connecting"
-        break;
-      default:
-        break;
-    }
-  }
-
-  removeToGroup(){
-    //this.messageService.removeToGroup()
+    this.spinner.show("pulse");
+    setTimeout(() => this.spinner.hide("pulse"), 1000);
+    this.roomName=this.route.snapshot.paramMap.get("roomName");
   }
 
 }

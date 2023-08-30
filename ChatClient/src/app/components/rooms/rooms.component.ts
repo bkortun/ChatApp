@@ -1,5 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
 import { MessageService } from 'src/app/services/message.service';
+import { TestService } from 'src/app/services/test.service';
 
 @Component({
   selector: 'app-rooms',
@@ -8,15 +12,21 @@ import { MessageService } from 'src/app/services/message.service';
 })
 export class RoomsComponent implements OnInit {
 
-  constructor(private messageService:MessageService) { }
-
+  constructor(private testService:TestService,private route: ActivatedRoute) { }
+  roomName:string
   ngOnInit(): void {
+
   }
 
-
-
-  addToGroup(){
-   // this.messageService.addToGroup()
+  test(){
+    this.testService.getData().subscribe(
+      response => {
+        this.testService = response;
+        console.log(this.testService); // Gelen veriyi konsolda görüntüle
+      },
+      error => {
+        console.error('Error fetching data:', error);
+      })
   }
 
 }
