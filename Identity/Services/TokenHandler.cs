@@ -34,6 +34,7 @@ namespace Identity.Services
 					new Claim("username", generateTokenRequest.UserName),
 					new Claim("email", generateTokenRequest.Email),
 					new Claim("role", generateTokenRequest.Role.First()),
+					new Claim("id",generateTokenRequest.Id)
 				},
 				notBefore: dateTimeNow,
 				expires: dateTimeNow.Add(TimeSpan.FromMinutes(10)),

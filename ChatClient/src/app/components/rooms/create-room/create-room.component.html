@@ -1,0 +1,16 @@
+ <div class="modal-header">
+    <h4 class="modal-title pull-left">Modal</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="closeModal()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-outline mb-4">
+      <input type="text" id="name"[(ngModel)]="roomName" class="form-control form-control-lg" />
+      <label class="form-label" for="name">Room Name</label>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-success" (click)="createRoom()">Create Room</button>
+  </div>
+

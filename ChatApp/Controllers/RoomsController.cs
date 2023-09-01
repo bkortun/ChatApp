@@ -19,6 +19,7 @@ namespace ChatApp.Controllers
 			_roomRepository = roomRepository;
 		}
 
+		
 		[HttpPost]
 		public async Task<IActionResult> Add(RoomAddRequest request)
 		{

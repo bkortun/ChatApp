@@ -50,7 +50,8 @@ namespace Identity.Services
 					{
 						UserName = findedUser.UserName,
 						Email = findedUser.Email,
-						Role = roles
+						Role = roles,
+						Id = findedUser.Id
 					});
 					return new TokenResponse
 					{
@@ -88,7 +89,8 @@ namespace Identity.Services
 				{
 					UserName = newUser.UserName,
 					Email = newUser.Email,
-					Role = roles
+					Role = roles,
+					Id= newUser.Id
 				});
 				return new TokenResponse
 				{
