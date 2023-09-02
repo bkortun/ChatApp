@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Client } from 'src/app/models/client';
+import { AuthorizationService } from 'src/app/services/authorization.service';
 import { MessageService } from 'src/app/services/message.service';
 
 @Component({
@@ -9,25 +10,37 @@ import { MessageService } from 'src/app/services/message.service';
 })
 export class UsersComponent implements OnInit {
 
-  constructor(private messageService:MessageService) { }
+  constructor(private messageService:MessageService, private authorizationService:AuthorizationService) { }
 
-  username=""
   clients:Client[]
 
-  ngOnInit(): void {
+  async ngOnInit() {
+
+    await this.messageService.checkConnectionStatusRecursive()
+
+    this.sendUsername();
     this.messageService.connection.on('ListClients',(clients:Client[])=>{
       this.clients=clients
     })
   }
 
   sendUsername(){
-    if(this.username!=""){
-      this.messageService.setConnectionToUser(this.username);
+    const decodeToken=this.authorizationService.getDecodedToken();
+    if(decodeToken["userName"]!=""){
+      this.messageService.setConnectionToUser(decodeToken["username"],decodeToken["id"]);
       this.getClients();
     }
   }
 
   async getClients(){
    this.clients= await this.messageService.getClientsList();
+  }
+
+  ngOnDestroy(): void {
+    const decodeToken=this.authorizationService.getDecodedToken();
+    if(decodeToken["userName"]!=""){
+      this.messageService.removeConnectionToUser(decodeToken["id"]);
+    }
+
   }
 }

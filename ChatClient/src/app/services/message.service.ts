@@ -37,13 +37,21 @@ export class MessageService {
           this.clients=clients
         })
     }).catch(err => console.error('Error while starting SignalR connection:', err));
-
-    // this.connection.onreconnecting(()=>this.connectionStatus=ConnectionStatus.Connecting)
-    // this.connection.onclose(()=>this.connectionStatus=ConnectionStatus.Failed)
-    // this.connection.onreconnected(()=>this.connectionStatus=ConnectionStatus.Connected)
-    //TODO bu çıktıları ekrana veremedim
-
    }
+
+   async checkConnectionStatusRecursive(): Promise<void> {
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        if (this.connection.state === 'Connected') {
+          console.log('SignalR bağlantısı hala açık.');
+          resolve();
+        } else {
+          console.warn('SignalR bağlantısı kapatıldı veya hala kurulmamış.');
+          this.checkConnectionStatusRecursive().then(() => resolve());
+        }
+      }, 1000);
+    });
+  }
 
    private async startAsync():Promise<void>{
     try{
@@ -55,16 +63,20 @@ export class MessageService {
     }
    }
 
-   sendMessage(message:string){
-    this.connection.invoke("SendAsync",message).catch(error=>console.log(error))
+   sendMessage(message:string,userId:string){
+    this.connection.invoke("SendAsync",message,userId).catch(error=>console.log(error))
    }
 
    getMessageObservable(): Observable<Message> {
     return this.messageSubject.asObservable();
   }
 
-  async setConnectionToUser(username:string){
-    this.connection.invoke("AddClientAsync",username)
+  async setConnectionToUser(username:string,userId:string){
+    this.connection.invoke("AddClientAsync",username,userId)
+  }
+
+  async removeConnectionToUser(userId:string){
+    this.connection.invoke("RemoveClientAsync",userId)
   }
 
   async getClientsList():Promise<Client[]>{

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { RoomService } from 'src/app/services/room.service';
-import jwt_decode from 'jwt-decode';
 import { RoomAdd } from 'src/app/models/RoomModels/roomAdd';
+import { AuthorizationService } from 'src/app/services/authorization.service';
 
 @Component({
   selector: 'app-create-room',
@@ -13,7 +13,7 @@ export class CreateRoomComponent implements OnInit {
 
   roomName=""
 
-  constructor(public bsModalRef: BsModalRef, private roomService:RoomService) {
+  constructor(public bsModalRef: BsModalRef, private roomService:RoomService,private authorizationService:AuthorizationService) {
 
   }
 
@@ -24,9 +24,8 @@ export class CreateRoomComponent implements OnInit {
   }
 
   createRoom() {
-    const token = localStorage.getItem('token');
-    const decodedToken = jwt_decode(token);
-    console.log(token)
+    const token=this.authorizationService.getToken();
+    const decodedToken=this.authorizationService.getDecodedToken();
     let room:RoomAdd={
       name:this.roomName,
       hostId:decodedToken["id"]

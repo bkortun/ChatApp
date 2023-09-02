@@ -10,18 +10,36 @@ using System.Threading.Tasks;
 
 namespace SignalR.Hubs
 {
-	public class MessageHub:Hub<IMessageClient>
+	public class MessageHub : Hub<IMessageClient>
 	{
-		
-		public async Task AddClientAsync(string username)
+
+		public async Task AddClientAsync(string username, string userId)
 		{
 			Client client = new()
 			{
-				ConnectionId=Context.ConnectionId,
-				Username=username
+				ConnectionId = userId,
+				Username = username
 			};
-			ClientTestSource.Clients.Add(client);
-			await Clients.Others.ClientJoined(client.Username);
+			List<string> cliendIds= new List<string>();
+			ClientTestSource.Clients.ForEach((item) =>
+			{
+				cliendIds.Add(item.ConnectionId);
+			});
+
+			if (!cliendIds.Contains(userId))
+			{
+				ClientTestSource.Clients.Add(client);
+				await Clients.Others.ClientJoined(client.Username);
+			}
+		}
+
+		public async Task RemoveClientAsync(string userId)
+		{
+
+			var selectedClient=ClientTestSource.Clients.SingleOrDefault(c => c.ConnectionId == userId);
+			ClientTestSource.Clients.Remove(selectedClient);
+
+			await Clients.Others.ClientLeft(selectedClient.Username);
 		}
 
 		public async Task AddClientToGroupAsync(string groupName)
@@ -38,9 +56,9 @@ namespace SignalR.Hubs
 		{
 			await Clients.All.ListClients(ClientTestSource.Clients);
 		}
-		public async Task SendAsync(string message)
+		public async Task SendAsync(string message,string userId)
 		{
-			var senderClient = ClientTestSource.Clients.FirstOrDefault(a => a.ConnectionId == Context.ConnectionId);
+			var senderClient = ClientTestSource.Clients.FirstOrDefault(a => a.ConnectionId == userId);
 			await Clients.All.ReceiveMessage(message, senderClient);
 		}
 		public override async Task OnConnectedAsync()

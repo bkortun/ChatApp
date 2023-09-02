@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Client } from 'src/app/models/client';
+import { AuthorizationService } from 'src/app/services/authorization.service';
 import { MessageService } from 'src/app/services/message.service';
 
 @Component({
@@ -9,7 +10,7 @@ import { MessageService } from 'src/app/services/message.service';
 })
 export class ChatComponent implements OnInit {
 
-  constructor(private messageService:MessageService) { }
+  constructor(private messageService:MessageService,private authorizationService:AuthorizationService) { }
 
   message:string=""
   receivedMessages:string[]=[]
@@ -24,9 +25,10 @@ export class ChatComponent implements OnInit {
   }
 
   sendMessage(){
+    const decodedToken= this.authorizationService.getDecodedToken();
     if(this.message && this.message!="")
-      this.messageService.sendMessage(this.message)
-    this.message=""
+      this.messageService.sendMessage(this.message,decodedToken["id"]);
+    this.message="";
   }
 
 }
