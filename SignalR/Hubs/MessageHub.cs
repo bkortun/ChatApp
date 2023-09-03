@@ -29,18 +29,11 @@ namespace SignalR.Hubs
 			if (!cliendIds.Contains(userId))
 			{
 				ClientTestSource.Clients.Add(client);
+				Context.Items["id"]=userId;
 				await Clients.Others.ClientJoined(client.Username);
 			}
 		}
 
-		public async Task RemoveClientAsync(string userId)
-		{
-
-			var selectedClient=ClientTestSource.Clients.SingleOrDefault(c => c.ConnectionId == userId);
-			ClientTestSource.Clients.Remove(selectedClient);
-
-			await Clients.Others.ClientLeft(selectedClient.Username);
-		}
 
 		public async Task AddClientToGroupAsync(string groupName)
 		{
@@ -68,6 +61,15 @@ namespace SignalR.Hubs
 
 		public override async Task OnDisconnectedAsync(Exception? exception)
 		{
+			if (Context.Items.TryGetValue("id", out var id))
+			{
+				string userId = id.ToString();
+				var selectedClient = ClientTestSource.Clients.SingleOrDefault(c => c.ConnectionId == userId);
+				ClientTestSource.Clients.Remove(selectedClient);
+
+				await Clients.Others.ClientLeft(selectedClient.Username);
+				await Clients.All.ListClients(ClientTestSource.Clients);
+			}
 			await Clients.Others.ClientLeft(Context.ConnectionId);
 		}
 	}

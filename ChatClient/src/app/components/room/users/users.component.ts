@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Client } from 'src/app/models/client';
 import { AuthorizationService } from 'src/app/services/authorization.service';
 import { MessageService } from 'src/app/services/message.service';
+import jwt_decode from 'jwt-decode';
 
 @Component({
   selector: 'app-users',
@@ -10,37 +11,33 @@ import { MessageService } from 'src/app/services/message.service';
 })
 export class UsersComponent implements OnInit {
 
-  constructor(private messageService:MessageService, private authorizationService:AuthorizationService) { }
+  constructor(private messageService: MessageService, private authorizationService: AuthorizationService) {
 
-  clients:Client[]
+  }
+
+  clients: Client[]
 
   async ngOnInit() {
 
     await this.messageService.checkConnectionStatusRecursive()
 
     this.sendUsername();
-    this.messageService.connection.on('ListClients',(clients:Client[])=>{
-      this.clients=clients
+    this.messageService.connection.on('ListClients', (clients: Client[]) => {
+      this.clients = clients
     })
+
   }
 
-  sendUsername(){
-    const decodeToken=this.authorizationService.getDecodedToken();
-    if(decodeToken["userName"]!=""){
-      this.messageService.setConnectionToUser(decodeToken["username"],decodeToken["id"]);
+  sendUsername() {
+    const decodedToken = this.authorizationService.getDecodedToken();
+    if (decodedToken["userName"] != "") {
+      this.messageService.setConnectionToUser(decodedToken["username"], decodedToken["id"]);
       this.getClients();
     }
   }
 
-  async getClients(){
-   this.clients= await this.messageService.getClientsList();
+  async getClients() {
+    this.clients = await this.messageService.getClientsList();
   }
 
-  ngOnDestroy(): void {
-    const decodeToken=this.authorizationService.getDecodedToken();
-    if(decodeToken["userName"]!=""){
-      this.messageService.removeConnectionToUser(decodeToken["id"]);
-    }
-
-  }
 }

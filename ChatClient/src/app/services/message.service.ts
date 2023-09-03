@@ -6,6 +6,7 @@ import { Client } from '../models/client';
 import { Message } from '../models/message';
 import { Group } from '../models/group';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -37,6 +38,9 @@ export class MessageService {
           this.clients=clients
         })
     }).catch(err => console.error('Error while starting SignalR connection:', err));
+
+
+
    }
 
    async checkConnectionStatusRecursive(): Promise<void> {
