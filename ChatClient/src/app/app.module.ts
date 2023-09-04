@@ -10,6 +10,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { JwtModule } from '@auth0/angular-jwt';
 
 
 @NgModule({
@@ -24,7 +25,13 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     HttpClientModule,
     NgxSpinnerModule,
     ModalModule.forRoot(),
-    ButtonsModule.forRoot()
+    ButtonsModule.forRoot(),
+    JwtModule.forRoot({
+      config:{
+        tokenGetter:()=>localStorage.getItem("token"),
+        allowedDomains:["localhost:7149"]
+      }
+    })
   ],
   providers: [{provide:HTTP_INTERCEPTORS, useClass:AuthInterceptor, multi:true }],
   bootstrap: [AppComponent]

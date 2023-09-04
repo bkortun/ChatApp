@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import jwt_decode from 'jwt-decode';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthorizationService {
 
-  constructor() { }
+  constructor(private jwtHelper:JwtHelperService) { }
+
+  private _isAuthenticated:boolean;
 
   getDecodedToken(){
     const token = this.getToken();
@@ -19,5 +22,22 @@ export class AuthorizationService {
     const token = localStorage.getItem('token');
     console.log(token);
     return token;
+  }
+
+
+  checkToken(){
+    const token=this.getToken();
+    let isExpired:Boolean
+    try {
+      isExpired = this.jwtHelper.isTokenExpired(token)
+    } catch {
+
+      isExpired = true
+    }
+    this._isAuthenticated = token != null || !isExpired
+  }
+
+  get isAuthenticated() {
+    return this._isAuthenticated
   }
 }

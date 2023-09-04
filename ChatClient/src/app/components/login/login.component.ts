@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Token } from 'src/app/models/userModels/token';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 
@@ -14,7 +14,8 @@ export class LoginComponent implements OnInit {
   loginForm:FormGroup
   token:Token
 
-  constructor(private formBuilder:FormBuilder,private authenticationService:AuthenticationService,private router:Router) {
+  constructor(private formBuilder:FormBuilder,private authenticationService:AuthenticationService,private router:Router,
+    private activatedRoute:ActivatedRoute) {
     this.loginForm=formBuilder.group({
       email:[""],
       password:[""]
@@ -28,8 +29,12 @@ export class LoginComponent implements OnInit {
     this.token= await this.authenticationService.login(this.loginForm.value)
     console.log(this.token)
     localStorage.setItem("token",this.token.authToken)
-    if(this.token!=null){
-      this.router.navigate(["/rooms"]);
-    }
+    this.activatedRoute.queryParams.subscribe(params => {
+      const returnUrl: string = params["returnUrl"];
+      if (returnUrl)
+        this.router.navigateByUrl(returnUrl)
+      else
+        this.router.navigateByUrl("/")
+    });
   }
 }
