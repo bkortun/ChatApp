@@ -14,13 +14,11 @@ export class AuthorizationService {
   getDecodedToken(){
     const token = this.getToken();
     const decodedToken = jwt_decode(token);
-    console.log(decodedToken)
     return decodedToken;
   }
 
   getToken(){
     const token = localStorage.getItem('token');
-    console.log(token);
     return token;
   }
 

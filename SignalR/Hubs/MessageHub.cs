@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using DataAccess.Rooms;
+using Microsoft.AspNetCore.SignalR;
 using SignalR.Contracts;
 using SignalR.Models;
 using SignalR.Test;
@@ -12,13 +13,18 @@ namespace SignalR.Hubs
 {
 	public class MessageHub : Hub<IMessageClient>
 	{
-
-		public async Task AddClientAsync(string username, string userId)
+		private readonly IRoomRepository _roomRepository;
+		public MessageHub(IRoomRepository roomRepository)
+		{
+			_roomRepository = roomRepository;
+		}
+		public async Task AddClientAsync(string username, string userId,string groupName)
 		{
 			Client client = new()
 			{
 				ConnectionId = userId,
-				Username = username
+				Username = username,
+				GroupName = groupName
 			};
 			List<string> cliendIds= new List<string>();
 			ClientTestSource.Clients.ForEach((item) =>
@@ -30,35 +36,19 @@ namespace SignalR.Hubs
 			{
 				ClientTestSource.Clients.Add(client);
 				Context.Items["id"]=userId;
-				await Clients.Others.ClientJoined(client.Username);
+				await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 			}
 		}
-
-
-		public async Task AddClientToGroupAsync(string groupName)
+		public async Task ListClientsAsync(string groupName)
 		{
-			await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+			var clientsInSelectedGroup=ClientTestSource.Clients.Where(c => c.GroupName == groupName).ToList();
+			await Clients.Group(groupName).ListClients(clientsInSelectedGroup);
 		}
-
-		public async Task RemoveClientToGroupAsync(string groupName)
-		{
-			await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-		}
-
-		public async Task ListClientsAsync()
-		{
-			await Clients.All.ListClients(ClientTestSource.Clients);
-		}
-		public async Task SendAsync(string message,string userId)
+		public async Task SendAsync(string message,string userId,string groupName)
 		{
 			var senderClient = ClientTestSource.Clients.FirstOrDefault(a => a.ConnectionId == userId);
-			await Clients.All.ReceiveMessage(message, senderClient);
+			await Clients.Group(groupName).ReceiveMessage(message, senderClient);
 		}
-		public override async Task OnConnectedAsync()
-		{
-			await Clients.Caller.ClientJoined(Context.ConnectionId);
-		}
-
 		public override async Task OnDisconnectedAsync(Exception? exception)
 		{
 			if (Context.Items.TryGetValue("id", out var id))
@@ -67,10 +57,15 @@ namespace SignalR.Hubs
 				var selectedClient = ClientTestSource.Clients.SingleOrDefault(c => c.ConnectionId == userId);
 				ClientTestSource.Clients.Remove(selectedClient);
 
-				await Clients.Others.ClientLeft(selectedClient.Username);
-				await Clients.All.ListClients(ClientTestSource.Clients);
+				await Groups.RemoveFromGroupAsync(Context.ConnectionId, selectedClient.GroupName);
+				var clientsInSelectedGroup = ClientTestSource.Clients.Where(c => c.GroupName == selectedClient.GroupName).ToList();
+				await Clients.Group(selectedClient.GroupName).ListClients(clientsInSelectedGroup);
+
+				if (clientsInSelectedGroup.Count == 0)
+				{
+					await _roomRepository.DeleteAsync(selectedClient.GroupName);
+				}
 			}
-			await Clients.Others.ClientLeft(Context.ConnectionId);
 		}
 	}
 }

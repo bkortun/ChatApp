@@ -14,5 +14,6 @@ namespace DataAccess.Rooms
         Task AddAsync(Room room);
         Task UpdateAsync(Room room);
         Task DeleteAsync(Room room);
+        Task DeleteAsync(string roomId);
     }
 }

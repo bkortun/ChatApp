@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DataAccess.Rooms;
+using Microsoft.Extensions.DependencyInjection;
 using SignalR.HubContexts;
 using SignalR.HubServices;
 using System;
@@ -14,6 +15,7 @@ namespace SignalR.Configurations
         public static void AddSignalRServices(this IServiceCollection service)
         {
             service.AddTransient<IMessageHubService, MessageHubService>();
+            service.AddTransient<IRoomRepository, RoomRepository>();
             service.AddSignalR();
         }
     }

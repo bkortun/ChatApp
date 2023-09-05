@@ -28,12 +28,6 @@ export class MessageService {
           let clientsMessage:Message={message:message,client:client}
           this.messageSubject.next(clientsMessage);
         })
-        this.connection.on('ClientJoined',(connectionId)=>{
-          console.log(`${connectionId} joined`)
-        })
-        this.connection.on('ClientLeft',(connectionId)=>{
-          console.log(`${connectionId} left`)
-        })
         this.connection.on('ListClients',(clients:Client[])=>{
           this.clients=clients
         })
@@ -67,24 +61,24 @@ export class MessageService {
     }
    }
 
-   sendMessage(message:string,userId:string){
-    this.connection.invoke("SendAsync",message,userId).catch(error=>console.log(error))
+   sendMessage(message:string,userId:string,groupName){
+    this.connection.invoke("SendAsync",message,userId,groupName).catch(error=>console.log(error))
    }
 
    getMessageObservable(): Observable<Message> {
     return this.messageSubject.asObservable();
   }
 
-  async setConnectionToUser(username:string,userId:string){
-    this.connection.invoke("AddClientAsync",username,userId)
+  async setConnectionToUser(username:string,userId:string,groupName:string){
+    this.connection.invoke("AddClientAsync",username,userId,groupName)
   }
 
   async removeConnectionToUser(userId:string){
     this.connection.invoke("RemoveClientAsync",userId)
   }
 
-  async getClientsList():Promise<Client[]>{
-    await this.connection.invoke("ListClientsAsync")
+  async getClientsList(groupName:string):Promise<Client[]>{
+    await this.connection.invoke("ListClientsAsync",groupName)
     return this.clients;
   }
 

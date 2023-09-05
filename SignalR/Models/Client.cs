@@ -10,5 +10,6 @@ namespace SignalR.Models
 	{
         public string ConnectionId { get; set; }
         public string Username { get; set; }
+        public string GroupName { get; set; }
     }
 }

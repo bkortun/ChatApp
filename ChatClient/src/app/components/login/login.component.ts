@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
       if (returnUrl)
         this.router.navigateByUrl(returnUrl)
       else
-        this.router.navigateByUrl("/")
+        this.router.navigateByUrl("/rooms")
     });
   }
 }

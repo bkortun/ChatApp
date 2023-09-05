@@ -32,7 +32,7 @@ export class SignUpComponent implements OnInit {
   async onSubmit() {
     this.token=await this.authenticationService.signUp(this.signUpForm.value)
     if(this.token!=null){
-      this.router.navigate(["/rooms"]);
+      this.router.navigate([""]);
     }
   }
 

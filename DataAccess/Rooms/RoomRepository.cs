@@ -46,5 +46,13 @@ namespace DataAccess.Rooms
 			updatedEntity.State = EntityState.Modified;
 			await context.SaveChangesAsync();
 		}
+
+		public async Task DeleteAsync(string roomId)
+		{
+			var room= await context.Set<Room>().SingleOrDefaultAsync(r => r.Id == Guid.Parse(roomId));
+			var deletedEntity = context.Entry(room);
+			deletedEntity.State = EntityState.Deleted;
+			await context.SaveChangesAsync();
+		}
 	}
 }
