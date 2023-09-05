@@ -4,12 +4,32 @@
       <span aria-hidden="true" class="visually-hidden">&times;</span>
     </button>
   </div>
+  <form  [formGroup]="roomForm" (ngSubmit)="createRoom()">
   <div class="modal-body">
     <div class="form-outline mb-4">
-      <input type="text" id="name"[(ngModel)]="roomName" class="form-control form-control-lg" />
+      <input type="text" id="name" class="form-control form-control-lg" formControlName="name"/>
       <label class="form-label" for="name">Room Name</label>
     </div>
+    <div class="mb-3">
+      <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" formControlName="description"></textarea>
+      <label for="exampleFormControlTextarea1" class="form-label">Room Description</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="isPrivate" formControlName="isPrivate" id="inlineRadio1" value="public" (change)="changePrivateFlag()">
+      <label class="form-check-label" for="inlineRadio1">Public</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="isPrivate" formControlName="isPrivate" id="inlineRadio2" value="private" (change)="changePrivateFlag()">
+      <label class="form-check-label" for="inlineRadio2">Private</label>
+    </div>
+    <div *ngIf="privateFlag">
+      <div class="form-outline mb-4">
+        <input type="text" id="password" class="form-control form-control-lg" formControlName="password"/>
+        <label class="form-label" for="password">Room Password</label>
+      </div>
+    </div>
   </div>
+</form>
   <div class="modal-footer">
     <button type="submit" class="btn btn-success" (click)="createRoom()">Create Room</button>
   </div>

@@ -24,6 +24,9 @@ namespace DataAccess.Contexts
 				a.Property(p => p.Id).HasColumnName("Id");
 				a.Property(p => p.Name).HasColumnName("Name");
 				a.Property(p => p.HostId).HasColumnName("HostId");
+				a.Property(p => p.Description).HasColumnName("Description");
+				a.Property(p => p.Password).HasColumnName("Password");
+				a.Property(p => p.IsPrivate).HasColumnName("IsPrivate");
 			});
 
 		}

@@ -27,6 +27,9 @@ namespace ChatApp.Controllers
 			{
 				HostId = request.HostId,
 				Name = request.Name,
+				Description = request.Description,
+				IsPrivate = request.IsPrivate,
+				Password = request.Password,
 			};
 			await _roomRepository.AddAsync(room);
 			return Ok();

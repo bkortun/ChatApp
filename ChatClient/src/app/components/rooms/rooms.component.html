@@ -17,10 +17,17 @@
             <div class="card-body">
               <div class="row card-title">
                 <h5 class="col-md-8">{{room.name}}</h5>
-                <span class="badge text-bg-success col-md-4 p-2">(For everyone)</span>
+                <ng-container *ngIf="room.isPrivate; else elseTemplate">
+                  <span class="badge text-bg-danger col-md-4 p-2">Private</span>
+                </ng-container>
+                <ng-template #elseTemplate>
+                  <span class="badge text-bg-success col-md-4 p-2">Public</span>
+                </ng-template>
+
+
               </div>
 
-              <p class="card-text">Messages are not recorded in this room.</p>
+              <p class="card-text">{{room.description}}</p>
               <a href="/{{room.id}}" class="btn btn-primary">Join</a>
             </div>
           </div>

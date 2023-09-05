@@ -3,6 +3,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 import { RoomService } from 'src/app/services/room.service';
 import { RoomAdd } from 'src/app/models/RoomModels/roomAdd';
 import { AuthorizationService } from 'src/app/services/authorization.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-create-room',
@@ -11,10 +12,17 @@ import { AuthorizationService } from 'src/app/services/authorization.service';
 })
 export class CreateRoomComponent implements OnInit {
 
-  roomName=""
+  privateFlag=false;
+  roomForm:FormGroup;
 
-  constructor(public bsModalRef: BsModalRef, private roomService:RoomService,private authorizationService:AuthorizationService) {
-
+  constructor(public bsModalRef: BsModalRef, private roomService:RoomService,private authorizationService:AuthorizationService,
+    private formBuilder:FormBuilder) {
+    this.roomForm=formBuilder.group({
+      name:[""],
+      isPrivate:["public"],
+      description:[""],
+      password:[""]
+    })
   }
 
   ngOnInit(): void { }
@@ -24,15 +32,27 @@ export class CreateRoomComponent implements OnInit {
   }
 
   createRoom() {
+    let isPrivate;
+    if(this.roomForm.value["isPrivate"]=="public")
+      isPrivate=false;
+    else
+      isPrivate=true;
+
     const token=this.authorizationService.getToken();
     const decodedToken=this.authorizationService.getDecodedToken();
     let room:RoomAdd={
-      name:this.roomName,
-      hostId:decodedToken["id"]
+      name:this.roomForm.value["name"],
+      hostId:isPrivate?decodedToken["id"]:"",
+      description:this.roomForm.value["description"],
+      isPrivate:isPrivate,
+      password:isPrivate?this.roomForm.value["password"]:""
     }
-    console.log(room)
-    this.roomService.create(room,token)
+    this.roomService.create(room)
     this.bsModalRef.hide();
+  }
+
+  changePrivateFlag(){
+    this.privateFlag=!this.privateFlag;
   }
 
 }

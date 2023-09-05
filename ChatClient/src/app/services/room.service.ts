@@ -13,8 +13,8 @@ export class RoomService {
 
   constructor(private httpClient:HttpClient) { }
 
-  create(room:RoomAdd,token){
-    this.httpClient.post(`${this.baseUrl}/api/rooms`,room).subscribe(r=>console.log(r))
+  create(room:RoomAdd){
+    this.httpClient.post(`${this.baseUrl}/api/rooms`,room).subscribe()
   }
 
   async list():Promise<RoomList[]>{
