@@ -1,4 +1,5 @@
 ﻿using DataAccess.Rooms;
+using Identity.Services;
 using Microsoft.AspNetCore.SignalR;
 using SignalR.Contracts;
 using SignalR.Models;
@@ -14,11 +15,13 @@ namespace SignalR.Hubs
 	public class MessageHub : Hub<IMessageClient>
 	{
 		private readonly IRoomRepository _roomRepository;
-		public MessageHub(IRoomRepository roomRepository)
+		private readonly IAuthService _authService;
+		public MessageHub(IRoomRepository roomRepository, IAuthService authService)
 		{
 			_roomRepository = roomRepository;
+			_authService = authService;
 		}
-		public async Task AddClientAsync(string username, string userId,string groupName)
+		public async Task AddClientAsync(string username, string userId, string groupName)
 		{
 			Client client = new()
 			{
@@ -26,7 +29,7 @@ namespace SignalR.Hubs
 				Username = username,
 				GroupName = groupName
 			};
-			List<string> cliendIds= new List<string>();
+			List<string> cliendIds = new List<string>();
 			ClientTestSource.Clients.ForEach((item) =>
 			{
 				cliendIds.Add(item.ConnectionId);
@@ -35,16 +38,16 @@ namespace SignalR.Hubs
 			if (!cliendIds.Contains(userId))
 			{
 				ClientTestSource.Clients.Add(client);
-				Context.Items["id"]=userId;
+				Context.Items["id"] = userId;
 				await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 			}
 		}
 		public async Task ListClientsAsync(string groupName)
 		{
-			var clientsInSelectedGroup=ClientTestSource.Clients.Where(c => c.GroupName == groupName).ToList();
+			var clientsInSelectedGroup = ClientTestSource.Clients.Where(c => c.GroupName == groupName).ToList();
 			await Clients.Group(groupName).ListClients(clientsInSelectedGroup);
 		}
-		public async Task SendAsync(string message,string userId,string groupName)
+		public async Task SendAsync(string message, string userId, string groupName)
 		{
 			var senderClient = ClientTestSource.Clients.FirstOrDefault(a => a.ConnectionId == userId);
 			await Clients.Group(groupName).ReceiveMessage(message, senderClient);
@@ -61,10 +64,24 @@ namespace SignalR.Hubs
 				var clientsInSelectedGroup = ClientTestSource.Clients.Where(c => c.GroupName == selectedClient.GroupName).ToList();
 				await Clients.Group(selectedClient.GroupName).ListClients(clientsInSelectedGroup);
 
-				if (clientsInSelectedGroup.Count == 0)
+				var room = await _roomRepository.GetByIdAsync(selectedClient.GroupName);
+				if (room.IsPrivate)
 				{
-					await _roomRepository.DeleteAsync(selectedClient.GroupName);
+					if (room.HostId == userId)
+					{
+						await _authService.RemoveRoleToUserAsync($"host-{room.Id}", userId);
+						await _authService.DeleteRoleAsync($"host-{room.Id}");
+					}
+					else
+					{
+						await _authService.RemoveRoleToUserAsync($"guest-{room.Id}", userId);
+						await _authService.DeleteRoleAsync($"guest-{room.Id}");
+					}
+						
 				}
+
+				if (clientsInSelectedGroup.Count == 0)
+					await _roomRepository.DeleteAsync(selectedClient.GroupName);
 			}
 		}
 	}

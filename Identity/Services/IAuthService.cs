@@ -12,6 +12,9 @@ namespace Identity.Services
 		Task<TokenResponse> UserLoginAsync(UserLoginRequest userLoginRequest);
 		Task<TokenResponse> UserSignInAsync(UserSignInRequest userSignInRequest);
 		Task CreateRoleAsync(string roleName);
+		Task DeleteRoleAsync(string roleName);
+		Task<TokenResponse> AssaignRoleToUserAsync(string roleName,string userId);
+		Task RemoveRoleToUserAsync(string roleName,string userId);
 
 	}
 }

@@ -3,6 +3,7 @@ using Identity.Entities.Dtos;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,25 @@ namespace Identity.Services
 			_roleManager = roleManager;
 		}
 
+		public async Task<TokenResponse> AssaignRoleToUserAsync(string roleName, string userId)
+		{
+			var user=await _userManager.FindByIdAsync(userId);
+			await _userManager.AddToRoleAsync(user, roleName);
+			var roles=await _userManager.GetRolesAsync(user);
+			var accessToken = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
+			{
+				UserName = user.UserName,
+				Email = user.Email,
+				Roles= roles,
+				Id = user.Id
+			});
+			return new TokenResponse
+			{
+				AuthToken = accessToken.Token,
+				AccessTokenExpireDate = accessToken.Expiration
+			};
+		}
+
 		public async Task CreateRoleAsync(string roleName)
 		{
 			var isExist = await _roleManager.RoleExistsAsync(roleName);
@@ -32,6 +52,24 @@ namespace Identity.Services
 				Role role = new(roleName);
 				await _roleManager.CreateAsync(role);
 			}
+		}
+
+		public async Task DeleteRoleAsync(string roleName)
+		{
+			var isExist = await _roleManager.RoleExistsAsync(roleName);
+			if (isExist)
+			{
+				var role=await _roleManager.FindByNameAsync(roleName);
+				var a=await _roleManager.DeleteAsync(role);
+			}
+		}
+
+		public async Task RemoveRoleToUserAsync(string roleName, string userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+			await _userManager.RemoveFromRoleAsync(user, roleName);
+			var roles = await _userManager.GetRolesAsync(user);
+			
 		}
 
 		public async Task<TokenResponse> UserLoginAsync(UserLoginRequest userLoginRequest)
@@ -50,7 +88,7 @@ namespace Identity.Services
 					{
 						UserName = findedUser.UserName,
 						Email = findedUser.Email,
-						Role = roles,
+						Roles = roles,
 						Id = findedUser.Id
 					});
 					return new TokenResponse
@@ -83,13 +121,14 @@ namespace Identity.Services
 			var result = await _userManager.CreateAsync(newUser, userSignInRequest.Password);
 			if (result.Succeeded)
 			{
+				await CreateRoleAsync("client");
 				await _userManager.AddToRoleAsync(newUser, "client");
 				var roles= await _userManager.GetRolesAsync(newUser);
 				var accessToken = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
 				{
 					UserName = newUser.UserName,
 					Email = newUser.Email,
-					Role = roles,
+					Roles = roles,
 					Id= newUser.Id
 				});
 				return new TokenResponse

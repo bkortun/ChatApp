@@ -26,16 +26,23 @@ namespace Identity.Services
 
 			var dateTimeNow = DateTime.UtcNow;
 
-			JwtSecurityToken jwt = new(
-				issuer: _configuration["IdentitySettings:Issuer"],
-				audience: _configuration["IdentitySettings:Audience"],
-				claims: new List<Claim> 
+			var claims = new List<Claim>
 				{
 					new Claim("username", generateTokenRequest.UserName),
 					new Claim("email", generateTokenRequest.Email),
-					new Claim("role", generateTokenRequest.Role.First()),
 					new Claim("id",generateTokenRequest.Id)
-				},
+				};
+
+			foreach (var role in generateTokenRequest.Roles)
+			{
+				claims.Add(new Claim("roles", role));
+			}
+
+
+			JwtSecurityToken jwt = new(
+				issuer: _configuration["IdentitySettings:Issuer"],
+				audience: _configuration["IdentitySettings:Audience"],
+				claims: claims,
 				notBefore: dateTimeNow,
 				expires: dateTimeNow.Add(TimeSpan.FromMinutes(10)),
 				signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256)) ;
