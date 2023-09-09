@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,11 +21,12 @@ namespace Identity.Services
 			_configuration = configuration;
 		}
 
-		public Task<AccessToken> GenerateTokenAsync(GenerateTokenRequest generateTokenRequest)
+		public Task<Token> GenerateTokenAsync(GenerateTokenRequest generateTokenRequest)
 		{
 			SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["IdentitySettings:SecretKey"]));
 
 			var dateTimeNow = DateTime.UtcNow;
+			Console.WriteLine(dateTimeNow);
 
 			var claims = new List<Claim>
 				{
@@ -48,11 +50,22 @@ namespace Identity.Services
 				signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256)) ;
 
 			return Task.FromResult(
-				new AccessToken()
+				new Token()
 				{
-					Token = new JwtSecurityTokenHandler().WriteToken(jwt),
+					AccessToken = new JwtSecurityTokenHandler().WriteToken(jwt),
+					RefreshToken= GenerateRefreshToken(),
 					Expiration = dateTimeNow.Add(TimeSpan.FromMinutes(60))
 				});
+		}
+
+		private string GenerateRefreshToken()
+		{
+			byte[] bytes=new byte[32];
+			using (RandomNumberGenerator random=RandomNumberGenerator.Create())
+			{
+				random.GetBytes(bytes);
+				return Convert.ToBase64String(bytes);
+			}
 		}
 	}
 }

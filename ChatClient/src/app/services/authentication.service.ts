@@ -4,6 +4,7 @@ import { UserSignUp } from '../models/userModels/userSignUp';
 import { UserLogin } from '../models/userModels/userLogin';
 import { Observable, firstValueFrom } from 'rxjs';
 import { Token } from '../models/userModels/token';
+import { RefreshLogin } from '../models/userModels/refreshLogin';
 
 
 @Injectable({
@@ -22,6 +23,11 @@ export class AuthenticationService {
 
   async login(user:UserLogin):Promise<Token>{
     const observable:Observable<Token>= this.httpClient.post<Token>(`${this.baseUrl}/api/auth/Login`,user)
+    return await firstValueFrom(observable) as Token
+  }
+
+  async refreshLogin(user:RefreshLogin):Promise<Token>{
+    const observable:Observable<Token>= this.httpClient.post<Token>(`${this.baseUrl}/api/auth/RefreshLogin`,user)
     return await firstValueFrom(observable) as Token
   }
 }

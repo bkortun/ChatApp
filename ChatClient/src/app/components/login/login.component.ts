@@ -29,6 +29,7 @@ export class LoginComponent implements OnInit {
     this.token= await this.authenticationService.login(this.loginForm.value)
     console.log(this.token)
     localStorage.setItem("token",this.token.authToken)
+    localStorage.setItem("refreshtoken",this.token.refreshToken)
     this.activatedRoute.queryParams.subscribe(params => {
       const returnUrl: string = params["returnUrl"];
       if (returnUrl)

@@ -10,6 +10,7 @@ namespace Identity.Services
     public interface IAuthService
 	{
 		Task<TokenResponse> UserLoginAsync(UserLoginRequest userLoginRequest);
+		Task<TokenResponse> RefreshLoginAsync(string refreshToken, string email);
 		Task<TokenResponse> UserSignInAsync(UserSignInRequest userSignInRequest);
 		Task CreateRoleAsync(string roleName);
 		Task DeleteRoleAsync(string roleName);

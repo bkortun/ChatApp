@@ -30,6 +30,13 @@ namespace ChatApp.Controllers
 		}
 
 		[HttpPost("[action]")]
+		public async Task<IActionResult> RefreshLogin([FromBody] LoginRefreshRequest loginRequest)
+		{
+			var token = await _authService.RefreshLoginAsync(loginRequest.RefreshToken,loginRequest.Email);
+			return Ok(token);
+		}
+
+		[HttpPost("[action]")]
 		public async Task<IActionResult> SignIn([FromBody] SignInRequest signInRequest)
 		{
 			if(signInRequest.Password==signInRequest.PasswordRepeat)

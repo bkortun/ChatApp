@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Identity.Entities.Dtos
 {
-	public class AccessToken
+	public class Token
 	{
-        public string Token { get; set; }
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
         public DateTime Expiration { get; set; }
     }
 }

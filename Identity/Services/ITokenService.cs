@@ -9,6 +9,6 @@ namespace Identity.Services
 {
 	public interface ITokenService
 	{
-		public Task<AccessToken> GenerateTokenAsync(GenerateTokenRequest generateTokenRequest);
+		public Task<Token> GenerateTokenAsync(GenerateTokenRequest generateTokenRequest);
 	}
 }

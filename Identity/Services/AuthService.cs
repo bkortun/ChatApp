@@ -1,6 +1,8 @@
 ﻿using Identity.Entities;
 using Identity.Entities.Dtos;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,20 +29,20 @@ namespace Identity.Services
 
 		public async Task<TokenResponse> AssaignRoleToUserAsync(string roleName, string userId)
 		{
-			var user=await _userManager.FindByIdAsync(userId);
+			var user = await _userManager.FindByIdAsync(userId);
 			await _userManager.AddToRoleAsync(user, roleName);
-			var roles=await _userManager.GetRolesAsync(user);
-			var accessToken = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
+			var roles = await _userManager.GetRolesAsync(user);
+			var token = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
 			{
 				UserName = user.UserName,
 				Email = user.Email,
-				Roles= roles,
+				Roles = roles,
 				Id = user.Id
 			});
 			return new TokenResponse
 			{
-				AuthToken = accessToken.Token,
-				AccessTokenExpireDate = accessToken.Expiration
+				AuthToken = token.AccessToken,
+				AccessTokenExpireDate = token.Expiration
 			};
 		}
 
@@ -59,9 +61,39 @@ namespace Identity.Services
 			var isExist = await _roleManager.RoleExistsAsync(roleName);
 			if (isExist)
 			{
-				var role=await _roleManager.FindByNameAsync(roleName);
-				var a=await _roleManager.DeleteAsync(role);
+				var role = await _roleManager.FindByNameAsync(roleName);
+				var a = await _roleManager.DeleteAsync(role);
 			}
+		}
+
+		public async Task<TokenResponse> RefreshLoginAsync(string refreshToken, string email)
+		{
+			User user = await _userManager.FindByEmailAsync(email);
+			if (user != null && user?.RefreshTokenEndDate > DateTime.UtcNow)
+			{
+				var roles = await _userManager.GetRolesAsync(user);
+				var token = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
+				{
+					UserName = user.UserName,
+					Email = user.Email,
+					Roles = roles,
+					Id = user.Id
+				});
+				var tokenResponse = new TokenResponse()
+				{
+					RefreshToken = token.RefreshToken,
+					RefreshTokenExpireDate = token.Expiration.AddMinutes(10),
+					AuthToken = token.AccessToken,
+					AccessTokenExpireDate = token.Expiration
+				};
+
+				user.RefreshToken = token.RefreshToken;
+				user.RefreshTokenEndDate = token.Expiration.AddMinutes(10);
+				await _userManager.UpdateAsync(user);
+
+				return tokenResponse;
+			}
+			return null;
 		}
 
 		public async Task RemoveRoleToUserAsync(string roleName, string userId)
@@ -69,7 +101,7 @@ namespace Identity.Services
 			var user = await _userManager.FindByIdAsync(userId);
 			await _userManager.RemoveFromRoleAsync(user, roleName);
 			var roles = await _userManager.GetRolesAsync(user);
-			
+
 		}
 
 		public async Task<TokenResponse> UserLoginAsync(UserLoginRequest userLoginRequest)
@@ -84,18 +116,26 @@ namespace Identity.Services
 				if (result.Succeeded)
 				{
 					var roles = await _userManager.GetRolesAsync(findedUser);
-					var accessToken = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
+					var token = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
 					{
 						UserName = findedUser.UserName,
 						Email = findedUser.Email,
 						Roles = roles,
 						Id = findedUser.Id
 					});
-					return new TokenResponse
+					var tokenResponse = new TokenResponse()
 					{
-						AuthToken = accessToken.Token,
-						AccessTokenExpireDate = accessToken.Expiration
+						RefreshToken = token.RefreshToken,
+						RefreshTokenExpireDate = token.Expiration.AddMinutes(10),
+						AuthToken = token.AccessToken,
+						AccessTokenExpireDate = token.Expiration
 					};
+
+					findedUser.RefreshToken= token.RefreshToken;
+					findedUser.RefreshTokenEndDate= token.Expiration.AddMinutes(10);
+					await _userManager.UpdateAsync(findedUser);
+
+					return tokenResponse;
 				}
 				else
 				{
@@ -123,18 +163,18 @@ namespace Identity.Services
 			{
 				await CreateRoleAsync("client");
 				await _userManager.AddToRoleAsync(newUser, "client");
-				var roles= await _userManager.GetRolesAsync(newUser);
-				var accessToken = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
+				var roles = await _userManager.GetRolesAsync(newUser);
+				var token = await _tokenService.GenerateTokenAsync(new GenerateTokenRequest
 				{
 					UserName = newUser.UserName,
 					Email = newUser.Email,
 					Roles = roles,
-					Id= newUser.Id
+					Id = newUser.Id
 				});
 				return new TokenResponse
 				{
-					AuthToken = accessToken.Token,
-					AccessTokenExpireDate = accessToken.Expiration
+					AuthToken = token.AccessToken,
+					AccessTokenExpireDate = token.Expiration
 				};
 			}
 			return null;
