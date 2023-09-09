@@ -18,15 +18,14 @@ export class RoomAuthGuard implements CanActivateChild {
 
       console.log(room)
 
+
       if(room.isPrivate){
         this.authorizationService.checkToken()
 
         let roles=this.authorizationService.getDecodedToken()["roles"]
 
         if(!this.findRole(roles,`host-${roomId}`) && !this.findRole(roles,`guest-${roomId}`)) {
-          this.router.navigate(["/"], {
-            queryParams: { returnUrl: state.url }
-          })
+          this.router.navigate(["/"])
           return false;
         }
 

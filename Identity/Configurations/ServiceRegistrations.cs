@@ -32,6 +32,7 @@ namespace Identity.Configurations
 			service.AddScoped<ITokenService, Services.TokenHandler>();
 			service.AddScoped<IAuthService, AuthService>();
 
+
 			service.AddAuthentication(options =>
 			{
 				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -46,15 +47,17 @@ namespace Identity.Configurations
 					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["IdentitySettings:SecretKey"])),
 					ValidateIssuer = true,
 					ValidateAudience = true,
-					ValidateLifetime = false,
-					ValidateIssuerSigningKey = true
+					ValidateLifetime = true,
+					ValidateIssuerSigningKey = true,
+					ClockSkew = TimeSpan.Zero
 				};
 			});
+
 
 			service.AddAuthorization();
 
 
-			
+
 		}
 	}
 }

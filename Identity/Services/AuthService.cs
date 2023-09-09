@@ -103,7 +103,7 @@ namespace Identity.Services
 					var count = await _userManager.GetAccessFailedCountAsync(findedUser);
 					if (count > 3)
 					{
-						await _userManager.SetLockoutEndDateAsync(findedUser, new DateTimeOffset(DateTime.Now.AddMinutes(1)));
+						await _userManager.SetLockoutEndDateAsync(findedUser, new DateTimeOffset(DateTime.Now.AddMinutes(5)));
 					}
 				}
 

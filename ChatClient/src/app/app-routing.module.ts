@@ -11,7 +11,7 @@ const routes: Routes = [
   {path:"",component:LoginComponent},
   {path:"signUp",component:SignUpComponent},
   {path:"rooms",component:RoomsComponent,canActivate:[AuthGuard]},
-  {path:"",loadChildren:()=>import("../app/components/room/room.module").then(module=>module.RoomModule),canActivate:[AuthGuard],canActivateChild:[RoomAuthGuard]}
+  {path:"",loadChildren:()=>import("../app/components/room/room.module").then(module=>module.RoomModule),canActivateChild:[RoomAuthGuard]}
 ];
 
 @NgModule({

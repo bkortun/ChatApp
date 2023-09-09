@@ -32,13 +32,17 @@ namespace ChatApp.Controllers
 		[HttpPost("[action]")]
 		public async Task<IActionResult> SignIn([FromBody] SignInRequest signInRequest)
 		{
-			var token = await _authService.UserSignInAsync(new()
+			if(signInRequest.Password==signInRequest.PasswordRepeat)
 			{
-				Email = signInRequest.Email,
-				UserName = signInRequest.UserName,
-				Password = signInRequest.Password,
-			});
-			return Ok(token);
+				var token = await _authService.UserSignInAsync(new()
+				{
+					Email = signInRequest.Email,
+					UserName = signInRequest.UserName,
+					Password = signInRequest.Password,
+				});
+				return Ok(token);
+			}
+			return BadRequest("Password and repeat password must be same");
 		}
 
 		[HttpPost("[action]")]

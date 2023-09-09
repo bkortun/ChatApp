@@ -29,10 +29,9 @@ export class AuthorizationService {
     try {
       isExpired = this.jwtHelper.isTokenExpired(token)
     } catch {
-
       isExpired = true
     }
-    this._isAuthenticated = token != null || !isExpired
+    this._isAuthenticated = token != null && !isExpired
   }
 
   get isAuthenticated() {

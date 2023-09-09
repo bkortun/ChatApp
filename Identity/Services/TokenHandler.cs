@@ -44,14 +44,14 @@ namespace Identity.Services
 				audience: _configuration["IdentitySettings:Audience"],
 				claims: claims,
 				notBefore: dateTimeNow,
-				expires: dateTimeNow.Add(TimeSpan.FromMinutes(10)),
+				expires: dateTimeNow.Add(TimeSpan.FromMinutes(60)),
 				signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256)) ;
 
 			return Task.FromResult(
 				new AccessToken()
 				{
 					Token = new JwtSecurityTokenHandler().WriteToken(jwt),
-					Expiration = dateTimeNow.Add(TimeSpan.FromMinutes(10))
+					Expiration = dateTimeNow.Add(TimeSpan.FromMinutes(60))
 				});
 		}
 	}
