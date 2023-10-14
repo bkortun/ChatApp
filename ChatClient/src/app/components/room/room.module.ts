@@ -5,6 +5,7 @@ import { RoomComponent } from './room.component';
 import { FormsModule } from '@angular/forms';
 import { ChatComponent } from './chat/chat.component';
 import { RouterModule } from '@angular/router';
+import { ExitRoomComponent } from './exit-room/exit-room.component';
 
 
 
@@ -12,7 +13,8 @@ import { RouterModule } from '@angular/router';
   declarations: [
     UsersComponent,
     ChatComponent,
-    RoomComponent
+    RoomComponent,
+    ExitRoomComponent
   ],
   imports: [
     CommonModule,

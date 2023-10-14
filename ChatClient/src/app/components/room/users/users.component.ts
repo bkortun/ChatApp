@@ -25,6 +25,7 @@ export class UsersComponent implements OnInit {
 
     this.sendUsername();
     this.messageService.connection.on('ListClients', (clients: Client[]) => {
+      console.log(clients)
       this.clients = clients
     })
 

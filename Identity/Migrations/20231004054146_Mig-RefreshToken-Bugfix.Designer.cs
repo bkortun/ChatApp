@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Identity.Migrations
 {
     [DbContext(typeof(ChatIdentityContext))]
-    [Migration("20230909113342_mig-refreshToken")]
-    partial class migrefreshToken
+    [Migration("20231004054146_Mig-RefreshToken-Bugfix")]
+    partial class MigRefreshTokenBugfix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,7 +94,6 @@ namespace Identity.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("RefreshToken")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("RefreshTokenEndDate")

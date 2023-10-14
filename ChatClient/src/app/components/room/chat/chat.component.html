@@ -1,6 +1,6 @@
 <div class="w-75 m-2" >
   <div class="input-group mb-3">
-    <input type="text" class="form-control" [(ngModel)]="message" placeholder="Message" aria-label="Message" aria-describedby="basic-addon1">
+    <input type="text" class="form-control" [(ngModel)]="message" placeholder="Message" (keyup.enter)="sendMessage()" aria-label="Message" aria-describedby="basic-addon1">
     <button type="button" class="btn btn-secondary" (click)="sendMessage()">Submit</button>
   </div>
   <div class="form-floating mb-3">

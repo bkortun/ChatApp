@@ -14,6 +14,7 @@ export class MessageService {
 
   public connection:HubConnection
   private messageSubject: Subject<Message> = new Subject<Message>();
+  private alertMessageSubject: Subject<Message> = new Subject<Message>();
   private baseUrl:string="https://localhost:7149"
 
   private clients:Client[]

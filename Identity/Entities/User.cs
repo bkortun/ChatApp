@@ -9,7 +9,7 @@ namespace Identity.Entities
 {
 	public class User:IdentityUser
 	{
-        public string RefreshToken { get; set; }
+        public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenEndDate { get; set; }
     }
 }

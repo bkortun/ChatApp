@@ -13,6 +13,7 @@ namespace SignalR.Contracts
 		Task ReceiveMessage(string message,Client client);
 		Task ClientJoined(string connectionId);
 		Task ClientLeft(string connectionId);
+		Task ReceiveAlertMessage(string username);
 
 
 	}

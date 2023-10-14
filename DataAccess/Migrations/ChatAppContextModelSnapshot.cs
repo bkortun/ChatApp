@@ -31,14 +31,16 @@ namespace DataAccess.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Description");
 
                     b.Property<string>("HostId")
                         .HasColumnType("text")
                         .HasColumnName("HostId");
 
                     b.Property<bool>("IsPrivate")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsPrivate");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -46,7 +48,8 @@ namespace DataAccess.Migrations
                         .HasColumnName("Name");
 
                     b.Property<string>("Password")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Password");
 
                     b.HasKey("Id");
 

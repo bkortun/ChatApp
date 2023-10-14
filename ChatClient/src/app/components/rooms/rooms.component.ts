@@ -24,6 +24,9 @@ export class RoomsComponent implements OnInit {
   roomName: string
   ngOnInit(): void {
     this.getRooms();
+    setInterval(() => {
+      this.getRooms();
+    }, 5000);
   }
 
   openModal() {

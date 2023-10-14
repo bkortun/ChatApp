@@ -19,7 +19,7 @@ export class RoomAuthGuard implements CanActivateChild {
       console.log(room)
 
 
-      if(room.isPrivate){
+      if(room!=null&& room.isPrivate){
         this.authorizationService.checkToken()
 
         let roles=this.authorizationService.getDecodedToken()["roles"]

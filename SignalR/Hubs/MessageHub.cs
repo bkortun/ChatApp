@@ -1,5 +1,7 @@
 ﻿using DataAccess.Rooms;
+using Identity.Entities;
 using Identity.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using SignalR.Contracts;
 using SignalR.Models;
@@ -15,11 +17,13 @@ namespace SignalR.Hubs
 	public class MessageHub : Hub<IMessageClient>
 	{
 		private readonly IRoomRepository _roomRepository;
+		private readonly UserManager<User> _userManager;
 		private readonly IAuthService _authService;
-		public MessageHub(IRoomRepository roomRepository, IAuthService authService)
+		public MessageHub(IRoomRepository roomRepository, IAuthService authService, UserManager<User> userManager)
 		{
 			_roomRepository = roomRepository;
 			_authService = authService;
+			_userManager = userManager;
 		}
 		public async Task AddClientAsync(string username, string userId, string groupName)
 		{
@@ -40,6 +44,8 @@ namespace SignalR.Hubs
 				ClientTestSource.Clients.Add(client);
 				Context.Items["id"] = userId;
 				await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+				var user=await _userManager.FindByIdAsync(userId);
+				await Clients.OthersInGroup(groupName).ReceiveAlertMessage(user.UserName);
 			}
 		}
 		public async Task ListClientsAsync(string groupName)
@@ -65,20 +71,24 @@ namespace SignalR.Hubs
 				await Clients.Group(selectedClient.GroupName).ListClients(clientsInSelectedGroup);
 
 				var room = await _roomRepository.GetByIdAsync(selectedClient.GroupName);
-				if (room.IsPrivate)
-				{
-					if (room.HostId == userId)
+				//Todo null check
+                if (room!=null) 
+                {
+					if (room.IsPrivate)
 					{
-						await _authService.RemoveRoleToUserAsync($"host-{room.Id}", userId);
-						await _authService.DeleteRoleAsync($"host-{room.Id}");
+						if (room.HostId == userId)
+						{
+							await _authService.RemoveRoleToUserAsync($"host-{room.Id}", userId);
+							await _authService.DeleteRoleAsync($"host-{room.Id}");
+						}
+						else
+						{
+							await _authService.RemoveRoleToUserAsync($"guest-{room.Id}", userId);
+							await _authService.DeleteRoleAsync($"guest-{room.Id}");
+						}
 					}
-					else
-					{
-						await _authService.RemoveRoleToUserAsync($"guest-{room.Id}", userId);
-						await _authService.DeleteRoleAsync($"guest-{room.Id}");
-					}
-						
 				}
+                
 
 				if (clientsInSelectedGroup.Count == 0)
 					await _roomRepository.DeleteAsync(selectedClient.GroupName);

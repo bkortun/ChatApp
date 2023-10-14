@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ChatAppContext))]
-    [Migration("20230830060935_add-rooms")]
-    partial class addrooms
+    [Migration("20231004054245_Mig-RefreshToken-Bugfix")]
+    partial class MigRefreshTokenBugfix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,15 +32,27 @@ namespace DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("Id");
 
-                    b.Property<string>("HostId")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("HostId")
+                        .HasColumnType("text")
                         .HasColumnName("HostId");
+
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsPrivate");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("Name");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("text")
+                        .HasColumnName("Password");
 
                     b.HasKey("Id");
 
