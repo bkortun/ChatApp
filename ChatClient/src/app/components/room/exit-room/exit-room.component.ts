@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BsModalRef } from 'ngx-bootstrap/modal';
+import { MessageService } from 'src/app/services/message.service';
 
 @Component({
   selector: 'app-exit-room',
@@ -9,7 +10,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 })
 export class ExitRoomComponent implements OnInit {
 
-  constructor(public bsModalRef: BsModalRef, private router:Router) { }
+  constructor(public bsModalRef: BsModalRef, private router:Router,private messageService:MessageService) { }
 
   ngOnInit(): void {
   }
@@ -19,6 +20,7 @@ export class ExitRoomComponent implements OnInit {
   }
 
   exitToRoom(){
+    this.messageService.connection.stop();
     this.router.navigate(["/rooms"]);
     this.closeModal();
   }

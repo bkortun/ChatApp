@@ -14,28 +14,26 @@ export class MessageService {
 
   public connection:HubConnection
   private messageSubject: Subject<Message> = new Subject<Message>();
-  private alertMessageSubject: Subject<Message> = new Subject<Message>();
   private baseUrl:string="https://localhost:7149"
 
   private clients:Client[]
-  constructor(private httpClient: HttpClient) {
+  constructor() {}
+
+   startConnection(){
     this.connection = new HubConnectionBuilder()
     .withUrl(`${this.baseUrl}/messages`)
     .withAutomaticReconnect()
     .build()
 
     this.startAsync().then(()=>{
-        this.connection.on('ReceiveMessage', (message: string, client:Client) => {
-          let clientsMessage:Message={message:message,client:client}
-          this.messageSubject.next(clientsMessage);
-        })
-        this.connection.on('ListClients',(clients:Client[])=>{
-          this.clients=clients
-        })
-    }).catch(err => console.error('Error while starting SignalR connection:', err));
-
-
-
+      this.connection.on('ReceiveMessage', (message: string, client:Client) => {
+        let clientsMessage:Message={message:message,client:client}
+        this.messageSubject.next(clientsMessage);
+      })
+      this.connection.on('ListClients',(clients:Client[])=>{
+        this.clients=clients
+      })
+  }).catch(err => console.error('Error while starting SignalR connection:', err));
    }
 
    async checkConnectionStatusRecursive(): Promise<void> {

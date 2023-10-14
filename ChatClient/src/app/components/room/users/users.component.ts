@@ -32,8 +32,6 @@ export class UsersComponent implements OnInit {
   }
 
   sendUsername() {
-
-
     const decodedToken = this.authorizationService.getDecodedToken();
     if (decodedToken["userName"] != "") {
       this.messageService.setConnectionToUser(decodedToken["username"], decodedToken["id"],this.roomName);
