@@ -26,9 +26,12 @@ export class RoomComponent implements OnInit {
     setTimeout(() => this.spinner.hide("pulse"), 1000);
     this.roomName=this.route.snapshot.paramMap.get("roomName");
 
-    this.messageService.connection.on('ReceiveAlertMessage', (username:string)=>{
+    this.messageService.connection.on('JoinAlertMessage', (username:string)=>{
           this.alertifyService.message(`${username} joined`,{position:AlertifyPosition.BottomRight,messageType:AlertifyMessageType.Success})
     })
+    this.messageService.connection.on('LeftAlertMessage', (username:string)=>{
+      this.alertifyService.message(`${username} left`,{position:AlertifyPosition.BottomRight,messageType:AlertifyMessageType.Error})
+})
   }
 
   openModal() {

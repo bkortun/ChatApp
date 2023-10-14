@@ -45,7 +45,7 @@ namespace SignalR.Hubs
 				Context.Items["id"] = userId;
 				await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 				var user=await _userManager.FindByIdAsync(userId);
-				await Clients.OthersInGroup(groupName).ReceiveAlertMessage(user.UserName);
+				await Clients.OthersInGroup(groupName).JoinAlertMessage(user.UserName);
 			}
 		}
 		public async Task ListClientsAsync(string groupName)
@@ -69,6 +69,9 @@ namespace SignalR.Hubs
 				await Groups.RemoveFromGroupAsync(Context.ConnectionId, selectedClient.GroupName);
 				var clientsInSelectedGroup = ClientTestSource.Clients.Where(c => c.GroupName == selectedClient.GroupName).ToList();
 				await Clients.Group(selectedClient.GroupName).ListClients(clientsInSelectedGroup);
+
+				var user = await _userManager.FindByIdAsync(userId);
+				await Clients.OthersInGroup(selectedClient.GroupName).LeftAlertMessage(user.UserName);
 
 				var room = await _roomRepository.GetByIdAsync(selectedClient.GroupName);
 				//Todo null check
